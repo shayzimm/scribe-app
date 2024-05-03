@@ -15,7 +15,12 @@ class Journal:
        self.id = last_id  
 
    def match(self, filter):
-        '''checks if the diary matches the filter text.
+        '''checks if the journal matches the filter text.
         Return true if it matches exactly, false if it does not match. 
         Filter is case-sensitive'''  
-        return filter in self.memo or self.tags
+        if filter in self.memo:
+            return True
+        for tag in self.tags:
+            if filter in tag:
+                return True
+        return False
