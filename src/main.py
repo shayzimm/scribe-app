@@ -24,3 +24,17 @@ class Journal:
             if filter in tag:
                 return True
         return False
+
+class JournalBook:   
+    '''Represent a collection of journals'''
+    def __init__(self):
+        ''' Initialize journalbook with an empty list'''
+        self.journals = []
+
+    def new_journal(self, memo, tags=''):
+       ''' Creates a new journal entry in the journalbook '''
+       self.journals.append(Journal(memo, tags))
+
+    def search_journal(self, filter):
+      ''' searches all journal entries that match the filter '''
+      return [ journal for journal in self.journals if journal.match(filter)]
