@@ -28,7 +28,7 @@ class Journal:
 class JournalBook:   
     '''Represent a collection of journals'''
     def __init__(self):
-        ''' Initialize journalbook with an empty list'''
+        ''' Initialise journalbook with an empty list'''
         self.journals = []
 
     def new_journal(self, memo, tags=''):
