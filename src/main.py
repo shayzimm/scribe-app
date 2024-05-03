@@ -1,40 +1,142 @@
-import datetime
+import sys
+from scribe import Journal, JournalBook
 
-#Store the next available id for all new journals or recent ones
-last_id = 0
+class Menu:
+ """
+    Initialize the Menu class.
 
-class Journal:
-   '''Represents a journal entry'''
-   def __init__(self, memo, tags=' '):
-       '''Initialises a new journal entry with memo and tags. Creation date of new journal and id are automatically set'''
-       self.memo = memo
-       self.tags = tags
-       self.creation_date = datetime.date.today()
-       global last_id
-       last_id +=1
-       self.id = last_id  
+    Initialize the JournalBook object and define the choices dictionary.
 
-   def match(self, filter):
-        '''checks if the journal matches the filter text.
-        Return true if it matches exactly, false if it does not match. 
-        Filter is case-sensitive'''  
-        if filter in self.memo:
-            return True
-        for tag in self.tags:
-            if filter in tag:
-                return True
-        return False
+    Args:
+    None
 
-class JournalBook:   
-    '''Represent a collection of journals'''
-    def __init__(self):
-        ''' Initialise journalbook with an empty list'''
-        self.journals = []
+    Returns:
+    None
+    """
+ def __init__(self):
+      self.journalbook = JournalBook()
+      self.choices = {
+           "1" : self.show_journals,
+           "2" : self.add_journal,
+           "3" : self.search_journals,
+           "4" : self.quit
+        }
 
-    def new_journal(self, memo, tags=''):
-       ''' Creates a new journal entry in the journalbook '''
-       self.journals.append(Journal(memo, tags))
+ def display_menu(self):
+       """
+        Display Scribe's menu.
 
-    def search_journal(self, filter):
-      ''' searches all journal entries that match the filter '''
-      return [ journal for journal in self.journals if journal.match(filter)]
+        Prints a welcome message and a list of available options for the user.
+
+        Args:
+        None
+
+        Returns:
+        None
+        """
+       print(""" 
+             Welcome to Scribe
+             What would you like to do today?
+             1. Show journal entries
+             2. Add journal
+             3. Search journals
+             4. Quit program
+             """)
+
+ def run(self):
+     """
+        Display menu and respond to user choices.
+
+        This method continuously displays the menu and responds to user input by
+        executing the corresponding function.
+
+        Args:
+        None
+
+        Returns:
+        None
+    """
+     while True:
+           self.display_menu()
+           choice = input("Enter an option: " )
+           action = self.choices.get(choice)
+           if action:
+                action()
+           else:
+              print("{0} is not a valid choice".format(choice))
+
+ def show_journals(self, journals=None):
+     """
+    Display all journal entries in journalbook.
+
+    If no journals are provided, it will use the journals from the journalbook object.
+
+    Args:
+    journals (list, optional): A list of Journal objects. Defaults to None.
+
+    Returns:
+    None: This function does not return any value. It prints the journal entries.
+    """
+     if not journals:
+        journals = self.journalbook.journals
+     for journal in journals:
+       print("{0}".format(journal.memo))
+
+ def add_journal(self):
+     """
+    Add a new journal entry to the JournalBook.
+
+    Args:
+    None
+
+    Returns:
+    None: This function does not return any value. It adds the journal entry to the JournalBook.
+    """
+     memo = input("Your entry: " )
+     self.journalbook.new_journal(memo)
+     print("Your entry has been added")   
+
+ def search_journals(self):
+     """
+    Search for a specific journal in the journalbook using the match filter.
+
+    Args:
+    None
+
+    Returns:
+    None: This function does not return any value. It prints the matching journal entries.
+
+    Raises:
+    ValueError: If no matching journals are found.
+    """
+     filter = input("Search for:  ")
+     journals = self.journalbook.search_journal(filter)
+     self.show_journals(journals)
+
+ def quit(self):
+      """
+    Terminate the program.
+
+    This method prints a thank you message and exits the program.
+
+    Args:
+    None
+
+    Returns:
+    None: This function does not return any value. It terminates the program.
+    """
+      print("Thank you for using Scribe today")
+      sys.exit(0)
+
+if __name__ == "__main__":
+    """
+    This is the main entry point of the program.
+    It initializes the Menu class and runs the application.
+
+    Args:
+    None
+
+    Returns:
+    None: This function does not return any value. It initializes the Menu class and runs the application.
+    """
+    Menu().run()
