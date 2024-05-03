@@ -1,6 +1,6 @@
 import datetime
 
-#Store the next available id for all new diaries or recent ones
+#Store the next available id for all new journals or recent ones
 last_id = 0
 
 class Journal:
