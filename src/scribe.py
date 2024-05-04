@@ -77,3 +77,19 @@ class JournalBook:
         :rtype: list
         """
         return [journal for journal in self.journals if journal.match(filter)]
+    
+    def delete_journal(self, journal_id):
+        """
+        Deletes a journal entry from the journalbook.
+
+        :param journal_id: The id of the journal entry to delete.
+        :type journal_id: int
+
+        :return: None
+        :rtype: None
+        """
+        for journal in self.journals:
+            if journal.id == journal_id:
+                self.journals.remove(journal)
+                return True
+        return False

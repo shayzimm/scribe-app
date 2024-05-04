@@ -19,7 +19,8 @@ class Menu:
             "1" : self.show_journals,
             "2" : self.add_journal,
             "3" : self.search_journals,
-            "4" : self.quit
+            "4" : self.delete_journal,
+            "5" : self.quit
         }
 
     def display_menu(self):
@@ -40,7 +41,8 @@ class Menu:
               1. Show a list of all journal entries
               2. Add a journal entry
               3. Search journals
-              4. Quit program
+              4. Delete a journal entry
+              5. Quit program
               """)
 
     def run(self):
@@ -112,6 +114,48 @@ class Menu:
         filter = input("Search for:  ")
         journals = self.journalbook.search_journal(filter)
         self.show_journals(journals)
+
+    def delete_journal(self):
+        """
+        Delete a specific journal entry from the JournalBook.
+
+        Args:
+        None
+
+        Returns:
+        bool: Returns True if the journal entry is successfully deleted, False otherwise.
+
+        Raises:
+        ValueError: If the journal entry with the specified ID is not found.
+
+        This method prompts the user to enter the ID of the journal entry to delete. If the user confirms the deletion, it attempts to delete the journal entry with the specified ID from the JournalBook. If the deletion is successful, it prints a message indicating that the journal entry has been deleted. If the deletion is not successful, it prints a message indicating that the journal entry could not be found. If the user cancels the deletion, it prints a message indicating that the deletion has been cancelled.
+        """
+        id_to_delete = int(input("Enter the ID of the journal entry to delete: "))
+        if self.confirm_delete():
+            deleted = self.journalbook.delete_journal(id_to_delete)
+            if deleted:
+                print(f"The journal entry with ID {id_to_delete} has been deleted.")
+            else:
+                print(f"The journal entry with ID {id_to_delete} could not be found.")
+        else:
+            print("Deletion cancelled.")
+
+    def confirm_delete(self):
+        """
+        Confirm the deletion of a journal entry.
+
+        This method prompts the user to confirm the deletion of a journal entry. It
+        asks the user if they are sure they want to delete the journal entry, and
+        returns True if the user confirms the deletion, and False otherwise.
+
+        Args:
+        None
+
+        Returns:
+        bool: Returns True if the user confirms the deletion, False otherwise.
+        """
+        choice = input("Are you sure you want to delete this journal entry? (y/n): ").lower()
+        return choice == "y"
 
     def quit(self):
         """
