@@ -3,24 +3,21 @@ import datetime
 from datetime import date
 import os
 
-#Store the next available id for all new journals or recent ones
-last_id = 0
-
 class Journal:
-    def __init__(self, memo, tags=' '):
+    last_id = 0
+    def __init__(self, memo, tags=None):
         """
-        Initialises a new journal entry with memo and tags. Creation date of new journal and id are automatically set.
+        Initialises a new journal entry with memo, tags, creation date, and an automatically assigned ID.
         :param memo: The content of the journal entry.
         :type memo: str
-        :param tags: Optional tags for the journal entry. Default is an empty string.
-        :type tags: str, optional
+        :param tags: Optional tags for the journal entry. Default is an empty list.
+        :type tags: list, optional
         """
         self.memo = memo
-        self.tags = tags
-        self.creation_date = datetime.date.today()
-        global last_id
-        last_id +=1
-        self.id = last_id  
+        self.tags = tags if tags is not None else []  # Use empty list as default tags
+        self.creation_date = datetime.datetime.now().date()  # Use current date and time
+        Journal.last_id += 1
+        self.id = Journal.last_id
 
     def match(self, filter):
         """

@@ -85,7 +85,14 @@ class Menu:
         if not journals:
             journals = self.journalbook.journals
         for journal in journals:
-            print(f"{journal.id}. {journal.memo}")
+            tags_str = ', '.join(journal.tags) if journal.tags else None
+            if tags_str:
+                print(f"{journal.id}. {journal.memo}\n"
+                    f"Tags: {tags_str}\n"
+                    f"Date created: {journal.creation_date}")
+            else:
+                print(f"{journal.id}. {journal.memo}\n"
+                    f"Date created: {journal.creation_date}")
 
     def add_journal(self):
         """
