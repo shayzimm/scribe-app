@@ -21,7 +21,8 @@ class Menu:
             "2" : self.show_journals,
             "3" : self.search_journals,
             "4" : self.delete_journal,
-            "5" : self.quit
+            "5" : self.export_menu,
+            "6" : self.quit
         }
 
     def display_menu(self):
@@ -43,7 +44,8 @@ class Menu:
               2. Display all journals
               3. Search journals
               4. Delete a journal
-              5. Quit program
+              5. Export journals
+              6. Quit program
               """)
 
     def run(self):
@@ -235,6 +237,39 @@ class Menu:
         """
         choice = input("Are you sure you want to delete this journal entry? (y/n): ").lower()
         return choice == "y"
+
+    def export_menu(self):
+        """Display export menu"""
+        print("""
+        Export Options:
+        1. Export to JSON
+        2. Export to CSV
+        3. Export to Text
+        """)
+
+        choice = input("Enter an option: ")
+        if choice == "1":
+            self.export_entries("exported_journal.json", "json")
+        elif choice == "2":
+            self.export_entries("exported_journal.csv", "csv")
+        elif choice == "3":
+            self.export_entries("exported_journal.txt", "txt")
+        else:
+            print("Invalid option. Please select a valid export option.")
+
+    def export_entries(self, filename, file_format='json'):
+        """
+        Export journal entries to a file in the specified format.
+
+        :param filename: The name of the file to export the entries to.
+        :type filename: str
+        :param file_format: The format of the file to export to ('json', 'csv', 'txt'). Default is 'json'.
+        :type file_format: str
+
+        :return: None
+        :rtype: None
+        """
+        self.journalbook.export_entries(filename, file_format)
 
     def quit(self):
         """
