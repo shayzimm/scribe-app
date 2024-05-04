@@ -82,7 +82,7 @@ class Menu:
         if not journals:
             journals = self.journalbook.journals
         for journal in journals:
-            print("{0}".format(journal.memo))
+            print(f"{journal.id}. {journal.memo}")
 
     def add_journal(self):
         """
