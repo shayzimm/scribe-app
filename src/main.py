@@ -1,4 +1,5 @@
 import sys
+import datetime
 from scribe import Journal, JournalBook
 
 class Menu:
@@ -16,8 +17,8 @@ class Menu:
     def __init__(self):
         self.journalbook = JournalBook()
         self.choices = {
-            "1" : self.show_journals,
-            "2" : self.add_journal,
+            "1" : self.add_journal,
+            "2" : self.show_journals,
             "3" : self.search_journals,
             "4" : self.delete_journal,
             "5" : self.quit
@@ -37,11 +38,11 @@ class Menu:
         """
         print("""
               Welcome to Scribe
-              What would you like to do today?
-              1. Show a list of all journal entries
-              2. Add a journal entry
+              Please select an option:
+              1. Add a new journal entry
+              2. Display all journals
               3. Search journals
-              4. Delete a journal entry
+              4. Delete a journal
               5. Quit program
               """)
 
@@ -95,50 +96,128 @@ class Menu:
         None: This function does not return any value. It adds the journal entry to the JournalBook.
         """
         memo = input("Your entry: " )
-        self.journalbook.new_journal(memo)
+        tags = input("Add tags separated by a comma, if desired: ").strip().split(",")
+        self.journalbook.new_journal(memo, tags)
         print("Your entry has been added")
 
     def search_journals(self):
         """
-        Search for a specific journal in the journalbook using the match filter.
+        Display sub-options for searching journal entries.
+
+        This method displays sub-options for searching journal entries, including search by keyword,
+        search by tags, and search by date.
+
+        Args:
+        None
+
+        Returns:
+        None: This function does not return any value.
+        """
+        while True:
+            print("""
+                  Search Options:
+                  1. Search by keyword
+                  2. Search by tags
+                  3. Search by date
+                  4. Back to main menu
+                  """)
+            choice = input("Enter an option: ")
+
+            if choice == "1":
+                self.search_by_keyword()
+            elif choice == "2":
+                self.search_by_tags()
+            elif choice == "3":
+                self.search_by_date()
+            elif choice == "4":
+                break
+            else:
+                print("Invalid choice. Please enter a valid option.")
+
+    def search_by_keyword(self):
+        """
+        Search journal entries by keyword.
+
+        This method prompts the user to enter a keyword and searches for journal entries
+        containing that keyword.
 
         Args:
         None
 
         Returns:
         None: This function does not return any value. It prints the matching journal entries.
-
-        Raises:
-        ValueError: If no matching journals are found.
         """
-        filter = input("Search for:  ")
-        journals = self.journalbook.search_journal(filter)
+        keyword = input("Enter keyword to search: ")
+        journals = self.journalbook.search_journal(keyword)
         self.show_journals(journals)
 
-    def delete_journal(self):
+    def search_by_tags(self):
         """
-        Delete a specific journal entry from the JournalBook.
+        Search journal entries by tags.
+
+        This method prompts the user to enter tags and searches for journal entries
+        containing any of those tags.
 
         Args:
         None
 
         Returns:
-        bool: Returns True if the journal entry is successfully deleted, False otherwise.
-
-        Raises:
-        ValueError: If the journal entry with the specified ID is not found.
-
-        This method prompts the user to enter the ID of the journal entry to delete. If the user confirms the deletion, it attempts to delete the journal entry with the specified ID from the JournalBook. If the deletion is successful, it prints a message indicating that the journal entry has been deleted. If the deletion is not successful, it prints a message indicating that the journal entry could not be found. If the user cancels the deletion, it prints a message indicating that the deletion has been cancelled.
+        None: This function does not return any value. It prints the matching journal entries.
         """
-        id_to_delete = int(input("Enter the ID of the journal entry to delete: "))
-        if self.confirm_delete():
-            deleted = self.journalbook.delete_journal(id_to_delete)
-            if deleted:
-                print(f"The journal entry with ID {id_to_delete} has been deleted.")
+        tags = input("Enter tags (comma-separated): ").strip().split(",")
+        journals = self.journalbook.search_by_tags(tags)
+        self.show_journals(journals)
+
+    def search_by_date(self):
+        """
+        Search journal entries by date range.
+
+        This method prompts the user to enter a start date and end date, and searches for journal entries
+        within that date range.
+
+        Args:
+        None
+
+        Returns:
+        None: This function does not return any value. It prints the matching journal entries.
+        """
+        start_date = input("Enter start date (YYYY-MM-DD): ")
+        end_date = input("Enter end date (YYYY-MM-DD): ")
+        try:
+            start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
+            end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+            journals = self.journalbook.search_by_date(start_date, end_date)
+            self.show_journals(journals)
+        except ValueError:
+            print("Invalid date format. Please use YYYY-MM-DD.")
+
+    def delete_journal(self):
+        """
+        Delete a specific journal entry from the JournalBook.
+
+        This method displays a list of all journal entries and prompts the user to choose which
+        entry to delete.
+
+        Args:
+        None
+
+        Returns:
+        None: This function does not return any value.
+        """
+        self.show_journals()  # Display list of all journal entries
+        journal_id = input("Enter the ID of the journal entry to delete: ")
+        try:
+            journal_id = int(journal_id)
+            if self.confirm_delete():
+                deleted = self.journalbook.delete_journal(journal_id)
+                if deleted:
+                    print(f"The journal entry with ID {journal_id} has been deleted.")
+                else:
+                    print(f"The journal entry with ID {journal_id} could not be found.")
             else:
-                print(f"The journal entry with ID {id_to_delete} could not be found.")
-        else:
-            print("Deletion cancelled.")
+                print("Deletion cancelled.")
+        except ValueError:
+            print("Invalid input. Please enter a valid ID.")
 
     def confirm_delete(self):
         """

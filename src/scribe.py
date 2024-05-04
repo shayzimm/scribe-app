@@ -78,6 +78,31 @@ class JournalBook:
         """
         return [journal for journal in self.journals if journal.match(filter)]
     
+    def search_by_date(self, start_date, end_date):
+        """
+        Search journal entries by date range.
+
+        Args:
+        start_date (datetime.date): Start date of the date range.
+        end_date (datetime.date): End date of the date range.
+
+        Returns:
+        list: A list of Journal objects that fall within the specified date range.
+        """
+        return [journal for journal in self.journals if start_date <= journal.creation_date <= end_date]
+    
+    def search_by_tags(self, tags):
+        """
+        Search journal entries by tags.
+
+        Args:
+        tags (list): A list of tags to search for.
+
+        Returns:
+        list: A list of Journal objects that match the specified tags.
+        """
+        return [journal for journal in self.journals if any(tag in journal.tags for tag in tags)]
+    
     def delete_journal(self, journal_id):
         """
         Deletes a journal entry from the journalbook.
