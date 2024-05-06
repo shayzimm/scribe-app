@@ -9,6 +9,7 @@ from tkinter import filedialog
 
 class Journal:
     last_id = 0
+
     def __init__(self, memo, tags=None):
         """
         Initialises a new journal entry with memo, tags, creation date, and an automatically assigned ID.
@@ -42,10 +43,12 @@ class Journal:
                 return True
         return False
 
+
 class JournalBook:
-    '''Represent a collection of journals'''
-    def __init__(self, storage_file='journal_entries.json'):
-        '''
+    """Represent a collection of journals"""
+
+    def __init__(self, storage_file="journal_entries.json"):
+        """
         Initialise journalbook with an empty list.
 
         This method initialises a new instance of JournalBook, which is a collection of Journal entries.
@@ -53,19 +56,23 @@ class JournalBook:
 
         :return: None
         :rtype: None
-        '''
+        """
         self.storage_file = storage_file
         self.load_entries()
 
     def load_entries(self):
         """Load journal entries from a JSON file."""
         if os.path.exists(self.storage_file):
-            with open(self.storage_file, 'r') as file:
+            with open(self.storage_file, "r") as file:
                 try:
                     data = json.load(file)
-                    self.journals = [self.create_journal_from_dict(entry) for entry in data]
+                    self.journals = [
+                        self.create_journal_from_dict(entry) for entry in data
+                    ]
                 except json.JSONDecodeError:
-                    print("Error: Unable to load JSON data. The file may be empty or contain invalid JSON.")
+                    print(
+                        "Error: Unable to load JSON data. The file may be empty or contain invalid JSON."
+                    )
                     self.journals = []
         else:
             self.journals = []
@@ -80,30 +87,32 @@ class JournalBook:
         Returns:
         Journal: A Journal object created from the dictionary data.
         """
-        memo = data.get('memo', '')
-        tags = data.get('tags', [])
-        creation_date = datetime.datetime.strptime(data.get('creation_date', ''), "%Y-%m-%d").date()
-        journal_id = data.get('id', 0)
+        memo = data.get("memo", "")
+        tags = data.get("tags", [])
+        creation_date = datetime.datetime.strptime(
+            data.get("creation_date", ""), "%Y-%m-%d"
+        ).date()
+        journal_id = data.get("id", 0)
         return Journal(memo, tags)
 
     def save_entries(self):
         """Save journal entries to a JSON file."""
-        with open(self.storage_file, 'w') as file:
+        with open(self.storage_file, "w") as file:
             # Serialize each journal entry individually
             serialized_entries = []
             for journal in self.journals:
                 serialized_entry = {
-                    'memo': journal.memo,
-                    'tags': journal.tags,
-                    'creation_date': journal.creation_date.isoformat(),
-                    'id': journal.id
+                    "memo": journal.memo,
+                    "tags": journal.tags,
+                    "creation_date": journal.creation_date.isoformat(),
+                    "id": journal.id,
                 }
                 serialized_entries.append(serialized_entry)
-            
+
             # Write the serialized entries to the JSON file
             json.dump(serialized_entries, file, indent=4)
 
-    def new_journal(self, memo, tags=''):
+    def new_journal(self, memo, tags=""):
         """
         Creates a new journal entry in the journalbook.
 
@@ -129,7 +138,7 @@ class JournalBook:
         :rtype: list
         """
         return [journal for journal in self.journals if journal.match(filter)]
-    
+
     def search_by_date(self, start_date, end_date):
         """
         Search journal entries by date range.
@@ -141,8 +150,12 @@ class JournalBook:
         Returns:
         list: A list of Journal objects that fall within the specified date range.
         """
-        return [journal for journal in self.journals if start_date <= journal.creation_date <= end_date]
-    
+        return [
+            journal
+            for journal in self.journals
+            if start_date <= journal.creation_date <= end_date
+        ]
+
     def search_by_tags(self, tags):
         """
         Search journal entries by tags.
@@ -153,7 +166,46 @@ class JournalBook:
         Returns:
         list: A list of Journal objects that match the specified tags.
         """
-        return [journal for journal in self.journals if any(tag in journal.tags for tag in tags)]
+        return [
+            journal
+            for journal in self.journals
+            if any(tag in journal.tags for tag in tags)
+        ]
+
+    def get_journal_by_id(self, journal_id):
+        """
+        Retrieve a journal entry by its ID.
+
+        Args:
+        journal_id (int): The ID of the journal entry to retrieve.
+
+        Returns:
+        Journal or None: The Journal object with the specified ID, or None if not found.
+        """
+        for journal in self.journals:
+            if journal.id == journal_id:
+                return journal
+        return None
+
+    def update_journal(self, journal_id, new_memo, new_tags):
+        """
+        Update a journal entry with new content and tags.
+
+        Args:
+        journal_id (int): The ID of the journal entry to update.
+        new_memo (str): The updated content of the journal entry.
+        new_tags (list): The updated tags of the journal entry.
+
+        Returns:
+        bool: True if the update was successful, False otherwise.
+        """
+        for journal in self.journals:
+            if journal.id == journal_id:
+                journal.memo = new_memo
+                journal.tags = new_tags
+                self.save_entries()  # Save changes to the json file
+                return True
+        return False
 
     def delete_journal(self, journal_id):
         """
@@ -171,8 +223,8 @@ class JournalBook:
                 self.save_entries()
                 return True
         return False
-   
-    def export_entries(self, filename, file_format='json', directory=None):
+
+    def export_entries(self, filename, file_format="json", directory=None):
         """
         Export journal entries to a file in the specified format.
 
@@ -194,24 +246,30 @@ class JournalBook:
                 print("No directory selected. Export operation cancelled.")
                 return
 
-        if file_format == 'json':
-            with open(os.path.join(directory, filename), 'w') as file:
-                json.dump(self.journals, file, default=self.json_serialization, indent=4)
-        elif file_format == 'csv':
-            with open(os.path.join(directory, filename), 'w', newline='') as file:
+        if file_format == "json":
+            with open(os.path.join(directory, filename), "w") as file:
+                json.dump(
+                    self.journals, file, default=self.json_serialization, indent=4
+                )
+        elif file_format == "csv":
+            with open(os.path.join(directory, filename), "w", newline="") as file:
                 writer = csv.writer(file)
-                writer.writerow(['Memo', 'Tags', 'Creation Date'])
+                writer.writerow(["Memo", "Tags", "Creation Date"])
                 for journal in self.journals:
-                    writer.writerow([journal.memo, ', '.join(journal.tags), journal.creation_date])
-        elif file_format == 'txt':
-            with open(os.path.join(directory, filename), 'w') as file:
+                    writer.writerow(
+                        [journal.memo, ", ".join(journal.tags), journal.creation_date]
+                    )
+        elif file_format == "txt":
+            with open(os.path.join(directory, filename), "w") as file:
                 for journal in self.journals:
                     file.write(f"Memo: {journal.memo}\n")
                     if journal.tags:
                         file.write(f"Tags: {', '.join(journal.tags)}\n")
                     file.write(f"Creation Date: {journal.creation_date}\n\n")
         else:
-            raise ValueError("Unsupported file format. Supported formats are 'json', 'csv', and 'txt'.")
+            raise ValueError(
+                "Unsupported file format. Supported formats are 'json', 'csv', and 'txt'."
+            )
 
         print(f"File exported successfully to: {os.path.join(directory, filename)}")
 
@@ -219,8 +277,11 @@ class JournalBook:
         """Custom JSON serialization function"""
         if isinstance(obj, date):
             return obj.isoformat()  # Serialize datetime.date objects to ISO format
-        elif hasattr(obj, '__dict__'):  # Check if the object has a __dict__ attribute
-            return obj.__dict__  # Serialize custom objects using their __dict__ attribute
+        elif hasattr(obj, "__dict__"):  # Check if the object has a __dict__ attribute
+            return (
+                obj.__dict__
+            )  # Serialize custom objects using their __dict__ attribute
         else:
-            raise TypeError("Object of type {} is not JSON serializable".format(type(obj).__name__))
-        
+            raise TypeError(
+                "Object of type {} is not JSON serializable".format(type(obj).__name__)
+            )

@@ -21,8 +21,9 @@ class Menu:
             "2" : self.show_journals,
             "3" : self.search_journals,
             "4" : self.delete_journal,
-            "5" : self.export_menu,
-            "6" : self.quit
+            "5" : self.edit_journal,
+            "6" : self.export_menu,
+            "7" : self.quit
         }
 
     def display_menu(self):
@@ -38,14 +39,15 @@ class Menu:
         None
         """
         print("""
-              Welcome to Scribe
-              Please select an option:
-              1. Add a new journal entry
-              2. Display all journals
-              3. Search journals
-              4. Delete a journal
-              5. Export journals
-              6. Quit program
+              Welcome to Scribe - Your Command Line Journal
+              Select an option:
+              1. Add a new entry
+              2. Display all entries
+              3. Search
+              4. Delete
+              5. Edit
+              6. Export
+              7. Quit program
               """)
 
     def run(self):
@@ -199,6 +201,34 @@ class Menu:
             self.show_journals(journals)
         except ValueError:
             print("Invalid date format. Please use YYYY-MM-DD.")
+
+    def edit_journal(self):
+        """
+        Edit a specific journal entry.
+
+        This method displays a list of all journal entries and prompts the user to choose which
+        entry to edit. It then allows the user to modify the content and tags of the selected entry.
+
+        Args:
+        None
+
+        Returns:
+        None: This function does not return any value.
+        """
+        self.show_journals()  # Display list of all journal entries
+        journal_id = input("Enter the ID of the journal entry to edit: ")
+        try:
+            journal_id = int(journal_id)
+            journal = self.journalbook.get_journal_by_id(journal_id)
+            if journal:
+                new_memo = input("Enter the new content for the journal entry: ")
+                new_tags = input("Enter the new tags for the journal entry (comma-separated): ").strip().split(",")
+                self.journalbook.update_journal(journal_id, new_memo, new_tags)
+                print("Journal entry updated successfully.")
+            else:
+                print(f"No journal entry found with ID {journal_id}.")
+        except ValueError:
+            print("Invalid input. Please enter a valid ID.")
 
     def delete_journal(self):
         """
