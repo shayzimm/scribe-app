@@ -1,4 +1,5 @@
 import sys
+import os
 import datetime
 from scribe import Journal, JournalBook
 
@@ -13,8 +14,10 @@ class Menu:
 
     Returns:
     None
-    """
+    """ 
     def __init__(self):
+        self.password_file = "password.txt"
+        self.password = self.load_password()
         self.journalbook = JournalBook()
         self.choices = {
             "1" : self.add_journal,
@@ -25,6 +28,42 @@ class Menu:
             "6" : self.export_menu,
             "7" : self.quit
         }
+
+    def load_password(self):
+        """
+        Load the password from a file if it exists, otherwise prompt the user to set up a password.
+        """
+        if os.path.exists(self.password_file):
+            with open(self.password_file, "r") as file:
+                return file.read().strip()
+        else:
+            return self.setup_password()
+        
+    def setup_password(self):
+        """
+        Prompt the user to set up a password.
+        """
+        while True:
+            password = input("Set up a password: ")
+            confirm_password = input("Confirm password: ")
+            if password == confirm_password:
+                with open(self.password_file, "w") as file:
+                    file.write(password)
+                return password
+            else:
+                print("Passwords do not match. Please try again.")
+        
+    def authenticate(self):
+        """
+        Authenticate user by checking password.
+        """
+        while True:
+            entered_password = input("Enter password: ")
+            if entered_password == self.password:
+                return True
+            else:
+                print("Incorrect password. Please try again.")
+                continue
 
     def display_menu(self):
         """
@@ -63,6 +102,12 @@ class Menu:
         Returns:
         None
         """
+        if not self.authenticate():
+            print("Authentication failed. Exiting program.")
+            return
+        else:
+            print("Authentication successful. Welcome to Scribe.")
+
         while True:
             self.display_menu()
             choice = input("Enter an option: " )
