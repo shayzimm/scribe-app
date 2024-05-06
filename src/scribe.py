@@ -1,7 +1,11 @@
 import json
+import os
+import csv
 import datetime
 from datetime import date
-import os
+import tkinter as tk
+from tkinter import filedialog
+
 
 class Journal:
     last_id = 0
@@ -30,7 +34,7 @@ class Journal:
 
         :return: True if the journal matches the filter, False otherwise.
         :rtype: bool
-        """  
+        """
         if filter in self.memo:
             return True
         for tag in self.tags:
@@ -38,7 +42,7 @@ class Journal:
                 return True
         return False
 
-class JournalBook:   
+class JournalBook:
     '''Represent a collection of journals'''
     def __init__(self, storage_file='journal_entries.json'):
         '''
@@ -150,7 +154,7 @@ class JournalBook:
         list: A list of Journal objects that match the specified tags.
         """
         return [journal for journal in self.journals if any(tag in journal.tags for tag in tags)]
-    
+
     def delete_journal(self, journal_id):
         """
         Deletes a journal entry from the journalbook.
@@ -167,8 +171,8 @@ class JournalBook:
                 self.save_entries()
                 return True
         return False
-    
-    def export_entries(self, filename, file_format='json'):
+   
+    def export_entries(self, filename, file_format='json', directory=None):
         """
         Export journal entries to a file in the specified format.
 
@@ -176,14 +180,40 @@ class JournalBook:
         :type filename: str
         :param file_format: The format of the file to export to ('json', 'csv', 'txt'). Default is 'json'.
         :type file_format: str
+        :param directory: Optional. The directory where the file should be saved. If not specified, a file dialog will be shown to select the directory.
+        :type directory: str
 
         :return: None
         :rtype: None
         """
+        if not directory:
+            root = tk.Tk()
+            root.withdraw()  # Hide the main window
+            directory = filedialog.askdirectory(title="Select Directory")
+            if not directory:
+                print("No directory selected. Export operation cancelled.")
+                return
+
         if file_format == 'json':
-            with open(filename, 'w') as file:
+            with open(os.path.join(directory, filename), 'w') as file:
                 json.dump(self.journals, file, default=self.json_serialization, indent=4)
-        # Add support for other formats (csv, txt) here...
+        elif file_format == 'csv':
+            with open(os.path.join(directory, filename), 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(['Memo', 'Tags', 'Creation Date'])
+                for journal in self.journals:
+                    writer.writerow([journal.memo, ', '.join(journal.tags), journal.creation_date])
+        elif file_format == 'txt':
+            with open(os.path.join(directory, filename), 'w') as file:
+                for journal in self.journals:
+                    file.write(f"Memo: {journal.memo}\n")
+                    if journal.tags:
+                        file.write(f"Tags: {', '.join(journal.tags)}\n")
+                    file.write(f"Creation Date: {journal.creation_date}\n\n")
+        else:
+            raise ValueError("Unsupported file format. Supported formats are 'json', 'csv', and 'txt'.")
+
+        print(f"File exported successfully to: {os.path.join(directory, filename)}")
 
     def json_serialization(self, obj):
         """Custom JSON serialization function"""

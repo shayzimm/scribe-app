@@ -1,7 +1,8 @@
 *.json
 exported_journal.json
 journal_entries.json
-
+exported_journal.txt
+exported_journal.csv
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -162,3 +163,4 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+exported_journal.json journal_entries.json
