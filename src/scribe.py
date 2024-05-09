@@ -5,7 +5,7 @@ import datetime
 from datetime import date
 import tkinter as tk
 from tkinter import filedialog
-
+from queue import Queue
 
 class Journal:
     last_id = 0
@@ -59,6 +59,7 @@ class JournalBook:
         """
         self.storage_file = storage_file
         self.load_entries()
+        self.queue = Queue()
 
     def load_entries(self):
         """Load journal entries from a JSON file."""
@@ -274,14 +275,33 @@ class JournalBook:
         print(f"File exported successfully to: {os.path.join(directory, filename)}")
 
     def json_serialization(self, obj):
-        """Custom JSON serialization function"""
+        """Custom JSON serialisation function"""
         if isinstance(obj, date):
-            return obj.isoformat()  # Serialize datetime.date objects to ISO format
+            return obj.isoformat()  # Serialise datetime.date objects to ISO format
         elif hasattr(obj, "__dict__"):  # Check if the object has a __dict__ attribute
             return (
                 obj.__dict__
-            )  # Serialize custom objects using their __dict__ attribute
+            )  # Serialise custom objects using their __dict__ attribute
         else:
             raise TypeError(
-                "Object of type {} is not JSON serializable".format(type(obj).__name__)
+                "Object of type {} is not JSON serialisable".format(type(obj).__name__)
             )
+
+    def perform_backup(self):
+        """
+        Perform automated backup of journal entries.
+
+        This method is responsible for performing automated backups of journal entries.
+        It saves a copy of the current journal entries to a separate backup file.
+        """
+        backup_filename = f"journal_entries_backup_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        backup_directory = "backups"  # You can change this directory as needed
+
+        # Ensure the backup directory exists, create it if it doesn't
+        if not os.path.exists(backup_directory):
+            os.makedirs(backup_directory)
+
+        # Save a backup copy of the current journal entries
+        backup_path = os.path.join(backup_directory, backup_filename)
+        self.export_entries(backup_path)
+        print(f"Backup created: {backup_path}")

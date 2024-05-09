@@ -4,6 +4,7 @@ journal_entries.json
 exported_journal.txt
 exported_journal.csv
 password.txt
+backups
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

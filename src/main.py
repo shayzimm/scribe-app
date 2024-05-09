@@ -1,7 +1,12 @@
 import sys
 import os
 import datetime
-from scribe import Journal, JournalBook
+import threading
+import time
+import schedule
+
+from scribe import JournalBook
+
 
 class Menu:
     """
@@ -14,20 +19,23 @@ class Menu:
 
     Returns:
     None
-    """ 
+    """
+
     def __init__(self):
+        self.should_exit = False
         self.password_file = "password.txt"
         self.password = self.load_password()
         self.journalbook = JournalBook()
         self.choices = {
-            "1" : self.add_journal,
-            "2" : self.show_journals,
-            "3" : self.search_journals,
-            "4" : self.delete_journal,
-            "5" : self.edit_journal,
-            "6" : self.export_menu,
-            "7" : self.quit
+            "1": self.add_journal,
+            "2": self.show_journals,
+            "3": self.search_journals,
+            "4": self.delete_journal,
+            "5": self.edit_journal,
+            "6": self.export_menu,
+            "7": self.quit,
         }
+        self.scheduler_thread = None
 
     def load_password(self):
         """
@@ -38,7 +46,7 @@ class Menu:
                 return file.read().strip()
         else:
             return self.setup_password()
-        
+
     def setup_password(self):
         """
         Prompt the user to set up a password.
@@ -52,7 +60,7 @@ class Menu:
                 return password
             else:
                 print("Passwords do not match. Please try again.")
-        
+
     def authenticate(self):
         """
         Authenticate user by checking password.
@@ -77,7 +85,8 @@ class Menu:
         Returns:
         None
         """
-        print("""
+        print(
+            """
               Welcome to Scribe - Your Command Line Journal
               Select an option:
               1. Add a new entry
@@ -87,7 +96,8 @@ class Menu:
               5. Edit
               6. Export
               7. Quit program
-              """)
+              """
+        )
 
     def run(self):
         """
@@ -110,7 +120,7 @@ class Menu:
 
         while True:
             self.display_menu()
-            choice = input("Enter an option: " )
+            choice = input("Enter an option: ")
             action = self.choices.get(choice)
             if action:
                 action()
@@ -132,14 +142,18 @@ class Menu:
         if not journals:
             journals = self.journalbook.journals
         for journal in journals:
-            tags_str = ', '.join(journal.tags) if journal.tags else None
+            tags_str = ", ".join(journal.tags) if journal.tags else None
             if tags_str:
-                print(f"{journal.id}. {journal.memo}\n"
+                print(
+                    f"{journal.id}. {journal.memo}\n"
                     f"Tags: {tags_str}\n"
-                    f"Date created: {journal.creation_date}")
+                    f"Date created: {journal.creation_date}"
+                )
             else:
-                print(f"{journal.id}. {journal.memo}\n"
-                    f"Date created: {journal.creation_date}")
+                print(
+                    f"{journal.id}. {journal.memo}\n"
+                    f"Date created: {journal.creation_date}"
+                )
 
     def add_journal(self):
         """
@@ -151,7 +165,7 @@ class Menu:
         Returns:
         None: This function does not return any value. It adds the journal entry to the JournalBook.
         """
-        memo = input("Your entry: " )
+        memo = input("Your entry: ")
         tags = input("Add tags separated by a comma, if desired: ").strip().split(",")
         self.journalbook.new_journal(memo, tags)
         print("Your entry has been added")
@@ -170,13 +184,15 @@ class Menu:
         None: This function does not return any value.
         """
         while True:
-            print("""
+            print(
+                """
                   Search Options:
                   1. Search by keyword
                   2. Search by tags
                   3. Search by date
                   4. Back to main menu
-                  """)
+                  """
+            )
             choice = input("Enter an option: ")
 
             if choice == "1":
@@ -267,7 +283,13 @@ class Menu:
             journal = self.journalbook.get_journal_by_id(journal_id)
             if journal:
                 new_memo = input("Enter the new content for the journal entry: ")
-                new_tags = input("Enter the new tags for the journal entry (comma-separated): ").strip().split(",")
+                new_tags = (
+                    input(
+                        "Enter the new tags for the journal entry (comma-separated): "
+                    )
+                    .strip()
+                    .split(",")
+                )
                 self.journalbook.update_journal(journal_id, new_memo, new_tags)
                 print("Journal entry updated successfully.")
             else:
@@ -317,17 +339,21 @@ class Menu:
         Returns:
         bool: Returns True if the user confirms the deletion, False otherwise.
         """
-        choice = input("Are you sure you want to delete this journal entry? (y/n): ").lower()
+        choice = input(
+            "Are you sure you want to delete this journal entry? (y/n): "
+        ).lower()
         return choice == "y"
 
     def export_menu(self):
         """Display export menu"""
-        print("""
+        print(
+            """
         Export Options:
         1. Export to JSON
         2. Export to CSV
         3. Export to Text
-        """)
+        """
+        )
 
         choice = input("Enter an option: ")
         if choice == "1":
@@ -339,7 +365,7 @@ class Menu:
         else:
             print("Invalid option. Please select a valid export option.")
 
-    def export_entries(self, filename, file_format='json'):
+    def export_entries(self, filename, file_format="json"):
         """
         Export journal entries to a file in the specified format.
 
@@ -366,17 +392,31 @@ class Menu:
         None: This function does not return any value. It terminates the program.
         """
         print("Thank you for using Scribe today")
+        # Set the flag to exit
+        self.should_exit = True
         sys.exit(0)
 
+def schedule_jobs(menu):
+    while not menu.should_exit:
+        schedule.run_pending()
+        time.sleep(1)
+
+def main():
+    journalbook = JournalBook()
+
+    # Schedule automated backups
+    schedule.every().day.at("12:09").do(journalbook.perform_backup)
+
+    # Initialize the Menu class and create the scheduler thread
+    menu = Menu()
+    menu.scheduler_thread = threading.Thread(target=schedule_jobs, args=(menu,))
+    menu.scheduler_thread.start()
+
+    # Run the application loop
+    menu.run()
+
+    # After the loop exits, join the scheduler thread to ensure it terminates
+    menu.scheduler_thread.join()
+
 if __name__ == "__main__":
-    """
-    This is the main entry point of the program.
-    It initialises the Menu class and runs the application.
-
-    Args:
-    None
-
-    Returns:
-    None: This function does not return any value. It initialises the Menu class and runs the application.
-    """
-    Menu().run()
+    main()
