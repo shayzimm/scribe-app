@@ -1,7 +1,7 @@
 # Scribe Application Help Documentation
 
 ## Introduction
-Welcome to the Scribe application help documentation. Scribe is a command-line journaling application designed to help you organize your thoughts and daily activities. This document provides instructions on how to install and use the Scribe application effectively.
+Welcome to the Scribe application help documentation. Scribe is a command-line journaling application designed to help you organise your thoughts and daily activities. This document provides instructions on how to install and use the Scribe application effectively.
 
 ## Installation
 To use Scribe, follow these installation steps:
