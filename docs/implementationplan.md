@@ -1,5 +1,7 @@
 # Implementation Plan: Journal Application
 
+[Kanban Board](https://trello.com/b/lIp5K9vY)
+
 ## Day 1-2: Setup and Basic Functionality
 
 ### Setup Project Environment
@@ -50,27 +52,25 @@
 - **Priority:** Medium
 
 ### Refinement and Testing
-- Refine user interface for better usability.
 - Conduct thorough testing of all features.
 - Address any remaining bugs or issues.
 - **Priority:** High
 
-## Day 7-8: Documentation and Finalization
+## Day 7-8: Documentation and Finalisation
 
 ### Documentation
 - Document usage instructions for the application.
 - Document code for future reference and maintenance.
 - **Priority:** Low
 
-### Final Testing and Deployment
+### Final Testing
 - Perform final testing of the application.
-- Prepare for deployment.
 - **Priority:** High
 
 ## Day 9-10: Deployment and Final Touches
 
-### Deployment
-- Deploy the application to production or make it available for users.
+### Bash Script
+- Write a bash script for automated installation
 - **Priority:** High
 
 ## Overall Timeline:
