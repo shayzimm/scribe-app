@@ -41,7 +41,7 @@ Scribe is a command-line journaling application designed to help you keep track 
 
 ## Style Guide
 
-[PEP8](https://peps.python.org/pep-0008/#documentation-strings)
+[PEP8](https://peps.python.org/pep-0008/)
 
 ## Scribe Walkthrough
 
