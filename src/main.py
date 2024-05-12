@@ -405,7 +405,7 @@ def main():
     journalbook = JournalBook()
 
     # Schedule automated backups
-    schedule.every().day.at("12:09").do(journalbook.perform_backup)
+    schedule.every().day.at("23:59").do(journalbook.perform_backup)
 
     # Initialize the Menu class and create the scheduler thread
     menu = Menu()
