@@ -1,20 +1,30 @@
 #!/bin/bash
-cd ./src
-if [[ -x "$(command -v python)" ]]
-then
-    pyv="$(python -V 2>&1)"
-    if [[ $pyv == "Python 3"* ]]
-    then
-        python3 -m venv .venv 
-        source .venv/bin/activate
-        pip3 install -r ./requirements.txt
-        python3 main.py
-    else
-        echo "Please update your version of Python." >&2
-    fi 
-else
-    echo 'Error: 
-    This program runs on Python, but it looks like Python is not installed.
-    To install Python, check out https://installpython3.com/' >&2
-  exit 1
+
+# Check if Python 3 is installed
+if ! command -v python3 &> /dev/null; then
+    echo "Python3 is a requirement for Scribe. To learn more about installing Python 3 visit the following: https://realpython.com/installing-python/"
+    exit 1
 fi
+
+# Check if pip3 is installed
+if ! command -v pip3 &> /dev/null; then
+    echo "Pip3 is a requirement for Scribe, I will install it for you. For a guide on installing pip3 manually, visit this link: https://pypi.org/project/pip/"
+    exit 1
+fi
+
+# Create a virtual environment if it doesn't exist
+if [ ! -d ".venv" ]; then
+    python3 -m venv .venv 
+fi
+
+# Activate the virtual environment
+source .venv/bin/activate
+
+# Upgrade pip in the virtual environment
+python3 -m pip install --upgrade pip
+
+# Install requirements
+python3 -m pip install -r ./requirements.txt
+
+# Run the main script
+python3 ./src/main.py
