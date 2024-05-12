@@ -33,7 +33,7 @@ Scribe is a command-line journaling application designed to help you keep track 
 
 [Implementation Plan](docs/implementationplan.md)
 
-[Kanban Board](https://trello.com/b/lIp5K9vY)
+[Kanban Board](https://trello.com/invite/b/lIp5K9vY/ATTIbd8b8e28b173cb2794b75b84fc3bb582D10C6BBF/scribe-app)
 
 ## Help Documentation
 

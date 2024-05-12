@@ -1,6 +1,6 @@
 # Implementation Plan: Journal Application
 
-[Kanban Board](https://trello.com/b/lIp5K9vY)
+[Kanban Board](https://trello.com/invite/b/lIp5K9vY/ATTIbd8b8e28b173cb2794b75b84fc3bb582D10C6BBF/scribe-app)
 
 ## Day 1-2: Setup and Basic Functionality
 
